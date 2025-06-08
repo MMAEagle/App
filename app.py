@@ -534,23 +534,26 @@ elif st.session_state.page == "history":
     import os
     import pandas as pd
 
-    history_folder = "APP"
-    history_files = [f for f in os.listdir(history_folder) if f.endswith(".xlsx") and f != "002 Stats.xlsx"]
+    # Λίστα μόνο των .xlsx στη ρίζα, εκτός από το αρχείο στατιστικών
+    history_files = [
+        f for f in os.listdir()
+        if f.endswith(".xlsx") and not f.startswith("002 Stats")
+    ]
 
     if not history_files:
         st.info("Δεν υπάρχουν αποθηκευμένες προβλέψεις.")
     else:
         for file in history_files:
             with st.expander(f"📄 {file}"):
-                file_path = os.path.join(history_folder, file)
                 try:
-                    hist_df = pd.read_excel(file_path)
+                    hist_df = pd.read_excel(file)  # Το αρχείο είναι στη ρίζα
+
                     required_cols = ["Fighter 1", "Fighter 2", "Prediction", "Winner"]
                     if set(required_cols).issubset(hist_df.columns):
-                        
                         # Προσθήκη στήλης με ✔️ ή ❌
                         hist_df["✅"] = hist_df.apply(
-                            lambda row: "✔️" if row["Prediction"] == row["Winner"] else "❌", axis=1
+                            lambda row: "✔️" if row["Prediction"] == row["Winner"] else "❌",
+                            axis=1
                         )
 
                         # Εμφάνιση πίνακα
